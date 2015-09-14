@@ -1,0 +1,2 @@
+require './helloapp'
+run HelloApp
