@@ -1,9 +1,9 @@
 class Image
 
-  attr_reader :key, :image_binary
+  attr_reader :upload_time, :image_binary
 
   def initialize(now_strftime, image_binary)
-    @key = now_strftime
+    @upload_time = now_strftime
     @image_binary = image_binary
   end
 end
