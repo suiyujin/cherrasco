@@ -6,6 +6,7 @@ require 'redis'
 require 'hiredis'
 require 'yaml'
 require 'json'
+require "fileutils"
 
 require './app/image'
 
@@ -32,6 +33,15 @@ class Main < Sinatra::Base
       Redis.new(config["hiredis"])
     end
 
+    def check_file_limit
+      # tmp/images/にn個以上ある場合は最新のn-1個を残して破棄
+      Dir.chdir("./tmp/images/")
+      image_files = Dir.glob("*.jpg")
+      if image_files.size >= LIMIT_NUM_DATA
+        FileUtils.rm(image_files[0, image_files.size - LIMIT_NUM_DATA])
+      end
+    end
+
     def check_data_limit(redis)
       # listにn個以上ある場合は最新のn-1個を残して破棄
       redis.ltrim("images", 0, 2) if redis.llen("images").to_i >= LIMIT_NUM_DATA
@@ -46,6 +56,7 @@ class Main < Sinatra::Base
   post '/upload' do
     begin
       image = Image.new(DateTime.now.strftime("%Y%m%d%H%M%S"), params[:image])
+      check_file_limit
       image.save_jpg_from_binary
 
       redis = redis_connect
