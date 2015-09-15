@@ -39,6 +39,7 @@ class Main < Sinatra::Base
   post '/upload' do
     #begin
       image = Image.new(DateTime.now.strftime("%Y%m%d%H%M%S"), params[:image])
+      image.save_jpg_from_binary_fileapi
 
   #    redis = redis_connect
   #    # listに4つ以上ある場合は最新の3つ以前のデータを破棄
