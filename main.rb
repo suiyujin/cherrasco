@@ -37,25 +37,25 @@ class Main < Sinatra::Base
   end
 
   post '/upload' do
-    #begin
+    begin
       image = Image.new(DateTime.now.strftime("%Y%m%d%H%M%S"), params[:image])
       image.save_jpg_from_binary
 
-  #    redis = redis_connect
-  #    # listに4つ以上ある場合は最新の3つ以前のデータを破棄
-  #    redis.ltrim("images", 0, 2) if redis.llen("images").to_i >= 4
-  #    redis.lpush("images",
-  #    {
-  #      upload_time: image.upload_time,
-  #      value: image.image_binary
-  #    }.to_json_raw_object)
+      redis = redis_connect
+      # listに4つ以上ある場合は最新の3つ以前のデータを破棄
+      redis.ltrim("images", 0, 2) if redis.llen("images").to_i >= 4
+      redis.lpush("images",
+      {
+        upload_time: image.upload_time,
+        value: params[:image]
+      }.to_json)
 
       status 200
       message = "uploadできたよ"
-#    rescue => e
-#      status 500
-#      message = "エラーです:#{e.message}"
-#    end
+    rescue => e
+      status 500
+      message = "エラーです:#{e.message}"
+    end
     { status: status, message: message }.to_json
   end
 end
