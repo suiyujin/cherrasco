@@ -7,6 +7,7 @@ gem "unicorn"
 gem "mysql2"
 gem "redis"
 gem "hiredis"
+gem "ruby-opencv"
 
 group :development do
   gem "foreman"

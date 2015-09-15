@@ -24,6 +24,7 @@ GEM
       rack (>= 1.0)
     raindrops (0.15.0)
     redis (3.2.1)
+    ruby-opencv (0.0.14)
     sinatra (1.4.6)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -54,6 +55,7 @@ DEPENDENCIES
   pry
   pry-doc
   redis
+  ruby-opencv
   sinatra
   sinatra-contrib
   unicorn
