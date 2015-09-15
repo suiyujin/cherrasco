@@ -11,7 +11,7 @@ require "fileutils"
 require './app/image'
 
 class Main < Sinatra::Base
-  LIMIT_NUM_DATA = 4
+  LIMIT_NUM_DATA = 3
 
   helpers do
     def load_config_file
@@ -34,17 +34,21 @@ class Main < Sinatra::Base
     end
 
     def check_file_limit
-      # tmp/images/にn個以上ある場合は最新のn-1個を残して破棄
-      Dir.chdir("./tmp/images/")
-      image_files = Dir.glob("*.jpg")
-      if image_files.size >= LIMIT_NUM_DATA
-        FileUtils.rm(image_files[0, image_files.size - LIMIT_NUM_DATA])
+      # tmp/images/にn個より多い場合は最新のn個を残して破棄
+      image_files = Array.new
+      Dir.chdir("./tmp/images/") do
+        image_files = Dir.glob("*.jpg")
+        if image_files.size > LIMIT_NUM_DATA
+          FileUtils.rm(image_files[0, image_files.size - LIMIT_NUM_DATA])
+        end
       end
     end
 
     def check_data_limit(redis)
       # listにn個以上ある場合は最新のn-1個を残して破棄
-      redis.ltrim("images", 0, 2) if redis.llen("images").to_i >= LIMIT_NUM_DATA
+      if redis.llen("images").to_i > LIMIT_NUM_DATA
+        redis.ltrim("images", 0, LIMIT_NUM_DATA - 1)
+      end
     end
   end
 
