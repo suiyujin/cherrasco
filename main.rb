@@ -10,6 +10,8 @@ require 'json'
 require './app/image'
 
 class Main < Sinatra::Base
+  LIMIT_NUM_DATA = 4
+
   helpers do
     def load_config_file
       YAML.load_file('./db/config.yml')
@@ -29,6 +31,11 @@ class Main < Sinatra::Base
       config = load_config_file
       Redis.new(config["hiredis"])
     end
+
+    def check_data_limit(redis)
+      # listにn個以上ある場合は最新のn-1個を残して破棄
+      redis.ltrim("images", 0, 2) if redis.llen("images").to_i >= LIMIT_NUM_DATA
+    end
   end
 
   get '/redis/keys' do
@@ -42,8 +49,7 @@ class Main < Sinatra::Base
       image.save_jpg_from_binary
 
       redis = redis_connect
-      # listに4つ以上ある場合は最新の3つ以前のデータを破棄
-      redis.ltrim("images", 0, 2) if redis.llen("images").to_i >= 4
+      check_data_limit(redis)
       redis.lpush("images",
       {
         upload_time: image.upload_time,
