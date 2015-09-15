@@ -3,6 +3,7 @@ GEM
   specs:
     backports (3.6.6)
     coderay (1.1.0)
+    hiredis (0.6.0)
     kgio (2.10.0)
     method_source (0.8.2)
     multi_json (1.11.2)
@@ -20,6 +21,7 @@ GEM
     rack-test (0.6.3)
       rack (>= 1.0)
     raindrops (0.15.0)
+    redis (3.2.1)
     sinatra (1.4.6)
       rack (~> 1.4)
       rack-protection (~> 1.4)
@@ -43,9 +45,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  hiredis
   mysql2
   pry
   pry-doc
+  redis
   sinatra
   sinatra-contrib
   unicorn

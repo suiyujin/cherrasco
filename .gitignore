@@ -6,4 +6,4 @@
 /tmp
 /vendor/bundle
 
-db/database.yml
+db/config.yml

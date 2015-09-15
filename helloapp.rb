@@ -2,18 +2,29 @@ require 'rubygems'
 require 'sinatra/base'
 require 'sinatra/reloader'
 require 'mysql2'
+require 'redis'
+require 'hiredis'
 require 'yaml'
 
 class HelloApp < Sinatra::Base
   helpers do
+    def load_config_file
+      YAML.load_file('./db/config.yml')
+    end
+
     def mysql_connect
-      db = YAML.load_file('./db/database.yml')
+      config = load_config_file
       Mysql2::Client.new(
-        :host => db["mysql2"]["host"],
-        :username => db["mysql2"]["username"],
-        :password => db["mysql2"]["password"],
-        :database => db["mysql2"]["database"]
+        :host => config["mysql2"]["host"],
+        :username => config["mysql2"]["username"],
+        :password => config["mysql2"]["password"],
+        :database => config["mysql2"]["database"]
       )
+    end
+
+    def redis_connect
+      config = load_config_file
+      Redis.new(config["hiredis"])
     end
   end
 
@@ -28,5 +39,10 @@ class HelloApp < Sinatra::Base
       name = result["name"]
     end
     name
+  end
+
+  get '/redis/keys' do
+    redis = redis_connect
+    redis.keys
   end
 end
