@@ -37,7 +37,7 @@ class Main < Sinatra::Base
   end
 
   post '/upload' do
-    begin
+    #begin
       image = Image.new(DateTime.now.strftime("%Y%m%d%H%M%S"), params[:image])
       redis = redis_connect
       # listに4つ以上ある場合は最新の3つ以前のデータを破棄
@@ -50,10 +50,10 @@ class Main < Sinatra::Base
 
       status 200
       message = "uploadできたよ"
-    rescue => e
-      status 500
-      message = "エラーです:#{e.message}"
-    end
+#    rescue => e
+#      status 500
+#      message = "エラーです:#{e.message}"
+#    end
     { status: status, message: message }.to_json
   end
 end
