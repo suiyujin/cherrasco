@@ -1,2 +1,2 @@
-require './helloapp'
-run HelloApp
+require './main'
+run Main
