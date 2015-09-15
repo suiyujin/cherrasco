@@ -34,7 +34,7 @@ class Main < Sinatra::Base
     end
 
     def check_file_limit
-      # tmp/images/にn個より多い場合は最新のn個を残して破棄
+      # tmp/images/内の画像がn個より多い場合、最新のn個を残して破棄
       Dir.chdir("./tmp/images/") do
         image_files = Dir.glob("*.jpg").sort
         if image_files.size > LIMIT_NUM_DATA
@@ -44,7 +44,7 @@ class Main < Sinatra::Base
     end
 
     def check_data_limit(redis)
-      # listにn個以上ある場合は最新のn-1個を残して破棄
+      # list内のデータがn個より多い場合、最新のn個を残して破棄
       if redis.llen("images").to_i > LIMIT_NUM_DATA
         redis.ltrim("images", 0, LIMIT_NUM_DATA - 1)
       end
