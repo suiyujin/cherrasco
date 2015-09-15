@@ -35,9 +35,8 @@ class Main < Sinatra::Base
 
     def check_file_limit
       # tmp/images/にn個より多い場合は最新のn個を残して破棄
-      image_files = Array.new
       Dir.chdir("./tmp/images/") do
-        image_files = Dir.glob("*.jpg")
+        image_files = Dir.glob("*.jpg").sort
         if image_files.size > LIMIT_NUM_DATA
           FileUtils.rm(image_files[0, image_files.size - LIMIT_NUM_DATA])
         end
