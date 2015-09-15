@@ -8,6 +8,7 @@ gem "mysql2"
 gem "redis"
 gem "hiredis"
 gem "ruby-opencv"
+gem "rmagick"
 
 group :development do
   gem "foreman"
