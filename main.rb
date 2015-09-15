@@ -45,9 +45,9 @@ class Main < Sinatra::Base
 
       status 200
       message = "uploadできたよ"
-    rescue
+    rescue => e
       status 500
-      message = "エラーです"
+      message = "エラーです:#{e.message}"
     end
     { status: status, message: message }.to_json
   end
