@@ -1,7 +1,4 @@
-require 'rmagick'
-
 class Image
-
   attr_reader :upload_time, :image_binary
 
   def initialize(now_strftime, image_hex)
@@ -9,16 +6,7 @@ class Image
     @image_binary = normalize_image_binary(image_hex)
   end
 
-  def save_jpg_from_binary_rmagick
-    magick_image = Magick::Image.from_blob(@image_binary).first
-    magick_image.format = 'JPEG'
-
-    save_path = File.expand_path(File.dirname(__FILE__)).sub(/app/, "tmp/images/")
-    file_name = "#{@upload_time}.jpg"
-    magick_image.write("#{save_path}#{file_name}")
-  end
-
-  def save_jpg_from_binary_fileapi
+  def save_jpg_from_binary
     save_path = File.expand_path(File.dirname(__FILE__)).sub(/app/, "tmp/images/")
     file_name = "#{@upload_time}.jpg"
 
