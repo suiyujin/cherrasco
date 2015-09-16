@@ -1,6 +1,7 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    apns (1.0.0)
     backports (3.6.6)
     coderay (1.1.0)
     foreman (0.78.0)
@@ -49,6 +50,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  apns
   foreman
   hiredis
   mysql2
