@@ -14,12 +14,7 @@ class HelloApp < Sinatra::Base
 
     def mysql_connect
       config = load_config_file
-      Mysql2::Client.new(
-        :host => config["mysql2"]["host"],
-        :username => config["mysql2"]["username"],
-        :password => config["mysql2"]["password"],
-        :database => config["mysql2"]["database"]
-      )
+      Mysql2::Client.new(config["mysql2"])
     end
 
     def redis_connect
