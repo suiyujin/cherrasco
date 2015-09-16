@@ -18,6 +18,20 @@ class Main < Sinatra::Base
     redis.keys
   end
 
+  post '/init' do
+    begin
+      image = Image.new('00000000000000', params[:image])
+      image.save_jpg_from_binary
+
+      status 200
+      message = "uploadできたよ"
+    rescue => e
+      status 500
+      message = "エラーです:#{e.message}"
+    end
+    { status: status, message: message }.to_json
+  end
+
   post '/upload' do
     begin
       image = Image.new(DateTime.now.strftime("%Y%m%d%H%M%S"), params[:image])
