@@ -14,7 +14,7 @@ class ImageAnalyzer
   end
 
   # 虫が存在するか
-  def exist_insect?
+  def exist_insect?(redis)
     @head_pos, @tail_pos, @enemy_pos = search_chupachaps
 
     puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}"
@@ -22,11 +22,19 @@ class ImageAnalyzer
     puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}"
 
     if @head_pos.nil? || @tail_pos.nil?
-      # TODO: 前回の座標を調べる
+      # 前回の座標でCvPointを生成する
+      head_pos_x, head_pos_y = redis.hmget('head_pos', 'x', 'y')
+      tail_pos_x, tail_pos_y = redis.hmget('tail_pos', 'x', 'y')
+      @head_pos = CvPoint.new(head_pos_x, head_pos_y)
+      @tail_pos = CvPoint.new(tail_pos_x, tail_pos_y)
+      p "WARN : head_pos and tail_pos seted previous value!"
     end
 
-    # boolを返す
-    true
+    # Redis上に今回のhead_posとtail_posを保存しておく
+    redis.hmset('head_pos', 'x', @head_pos.x.to_s, 'y', @head_pos.y.to_s)
+    redis.hmset('tail_pos', 'x', @tail_pos.x.to_s, 'y', @tail_pos.y.to_s)
+
+    @enemy_pos.nil? ? false : true
   end
 
   # ロボットへの命令を作成
