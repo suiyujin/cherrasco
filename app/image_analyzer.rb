@@ -3,6 +3,8 @@ include OpenCV
 
 class ImageAnalyzer
   INIT_UPLOAD_TIME = '00000000000000'
+  #両マーカーの中心点間の距離(メートル)を設定
+  KMarkerInterval = 0.10
 
   def initialize(previous_upload_time, current_upload_time)
     @previous_upload_time = previous_upload_time
@@ -19,19 +21,33 @@ class ImageAnalyzer
 
   # ロボットへの命令を作成
   def make_command
+    begin
+      background_image = CvMat.load(INIT_UPLOAD_TIME+".jpg")
+      input_img = CvMat.load()
+    rescue
+      puts "hirakemasen desita"
+    end
+
+    input_image =
+
     head_pos, tail_pos = check_robot_info
     p head_pos
     p tail_pos
 
-    if head_pos.nil || tail_pos.nil?
-      # 前回の座標を調べる
+    if head_pos.nil? || tail_pos.nil?
+      # TODO: 前回の座標を調べる
     end
+
     # ロボットが進むべき角度と距離を計算
+    enemy_center = check_insect_info
+    bot = MulyuRobot.new(head_pos, tail_pos, KMarkerInterval)
+    direction, distance_m = bot.calculateForTurn(enemy_center)
+    degree = direction * 180 / Math::PI
 
     # ロボットへの命令
     {
-      angle: 30,
-      distance_cm: 100
+      degree: degree,
+      distance_m: distance_m
     }
   end
 
@@ -39,6 +55,17 @@ class ImageAnalyzer
 
   # 虫の位置を検出
   def check_insect_info
+    rows = []
+    cols = []
+    cvmat.rows.times { |i|
+      cvmat.cols.times { |j|
+        if (cvmat[i,j][0] == 0)
+          rows << i
+          cols << j
+        end
+      }
+    }
+    CvPoint.new((cols.max-cols.min)/2,(rows.max-rows.min)/2)
   end
 
   # ロボットの位置と向きを検出
