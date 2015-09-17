@@ -15,15 +15,12 @@ class ImageAnalyzer
 
   # 虫が存在するか
   def exist_insect?
-    check_insect_info
-
     # boolを返す
     true
   end
 
   # ロボットへの命令を作成
   def make_command
-
     head_pos, tail_pos, enemy_pos = search_chupachaps
 
     puts head_pos
@@ -46,21 +43,6 @@ class ImageAnalyzer
   end
 
   private
-
-  # 虫の位置を検出
-  def check_insect_info(cvmat)
-    rows = []
-    cols = []
-    cvmat.rows.times { |i|
-      cvmat.cols.times { |j|
-        if (cvmat[i,j][0] == 0)
-          rows << i
-          cols << j
-        end
-      }
-    }
-    CvPoint.new((cols.max+cols.min)/2,(rows.max+rows.min)/2)
-  end
 
   def search_chupachaps
     head_pos = nil
@@ -125,9 +107,24 @@ class ImageAnalyzer
     end
     binarized_image = gray_smooth.threshold(30,255,CV_THRESH_BINARY)
     # binarized_image.save_image("binarized_image.png")
-    enemy_pos = check_insect_info(binarized_image)
+    enemy_pos = search_insect(binarized_image)
 
     [head_pos, tail_pos, enemy_pos]
+  end
+
+  # 虫の位置を調べる
+  def search_insect(cvmat)
+    rows = []
+    cols = []
+    cvmat.rows.times { |i|
+      cvmat.cols.times { |j|
+        if (cvmat[i,j][0] == 0)
+          rows << i
+          cols << j
+        end
+      }
+    }
+    CvPoint.new((cols.max+cols.min)/2,(rows.max+rows.min)/2)
   end
 
   def rgb2hsv(red, green, blue)
