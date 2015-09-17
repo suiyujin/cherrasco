@@ -19,8 +19,8 @@ class User
     @notified_flag = true
   end
 
-  def send_insect_execution
-    send_notification('虫を駆除しました！')
+  def send_insect_capture
+    send_notification('虫を捕獲しました！')
     @notified_flag = false
   end
 
