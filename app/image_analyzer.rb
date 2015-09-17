@@ -67,7 +67,7 @@ class ImageAnalyzer
 
 
     # 円毎にマーカーかチェック
-    match.each_with_index do |circle,index|
+    match.each do |circle|
       # 円に内接する四角形を切りぬき
       root2 = 2.0**(1.0/2.0)
       center_pos = CvPoint.new(circle[0], circle[1])
