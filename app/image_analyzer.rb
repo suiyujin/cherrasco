@@ -14,29 +14,34 @@ class ImageAnalyzer
   end
 
   # 虫が存在するか
-  def exist_insect?
-    check_insect_info
+  def exist_insect?(redis)
+    @head_pos, @tail_pos, @enemy_pos = search_chupachaps
 
-    # boolを返す
-    true
+    puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}"
+    puts "tail_pos :  #{@tail_pos.x}  #{@tail_pos.y}"
+    puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}"
+
+    if @head_pos.nil? || @tail_pos.nil?
+      # 前回の座標でCvPointを生成する
+      head_pos_x, head_pos_y = redis.hmget('head_pos', 'x', 'y')
+      tail_pos_x, tail_pos_y = redis.hmget('tail_pos', 'x', 'y')
+      @head_pos = CvPoint.new(head_pos_x, head_pos_y)
+      @tail_pos = CvPoint.new(tail_pos_x, tail_pos_y)
+      p "WARN : head_pos and tail_pos seted previous value!"
+    end
+
+    # Redis上に今回のhead_posとtail_posを保存しておく
+    redis.hmset('head_pos', 'x', @head_pos.x.to_s, 'y', @head_pos.y.to_s)
+    redis.hmset('tail_pos', 'x', @tail_pos.x.to_s, 'y', @tail_pos.y.to_s)
+
+    @enemy_pos.nil? ? false : true
   end
 
   # ロボットへの命令を作成
   def make_command
-
-    head_pos, tail_pos, enemy_pos = search_chupachaps
-
-    puts head_pos
-    puts tail_pos
-
-    if head_pos.nil? || tail_pos.nil?
-      # TODO: 前回の座標を調べる
-    end
-
     # ロボットが進むべき角度と距離を計算
-    puts "enemy_pos :" + enemy_pos.x.to_s + "  " + enemy_pos.y.to_s
-    bot = MulyuRobot.new(head_pos, tail_pos, KMarkerInterval)
-    direction, distance_m = bot.calculateForTurn(enemy_pos)
+    bot = MulyuRobot.new(@head_pos, @tail_pos, KMarkerInterval)
+    direction, distance_m = bot.calculateForTurn(@enemy_pos)
     degree = direction * 180 / Math::PI
     # ロボットへの命令
     {
@@ -46,21 +51,6 @@ class ImageAnalyzer
   end
 
   private
-
-  # 虫の位置を検出
-  def check_insect_info(cvmat)
-    rows = []
-    cols = []
-    cvmat.rows.times { |i|
-      cvmat.cols.times { |j|
-        if (cvmat[i,j][0] == 0)
-          rows << i
-          cols << j
-        end
-      }
-    }
-    CvPoint.new((cols.max+cols.min)/2,(rows.max+rows.min)/2)
-  end
 
   def search_chupachaps
     head_pos = nil
@@ -85,7 +75,7 @@ class ImageAnalyzer
 
 
     # 円毎にマーカーかチェック
-    match.each_with_index do |circle,index|
+    match.each do |circle|
       # 円に内接する四角形を切りぬき
       root2 = 2.0**(1.0/2.0)
       center_pos = CvPoint.new(circle[0], circle[1])
@@ -125,9 +115,24 @@ class ImageAnalyzer
     end
     binarized_image = gray_smooth.threshold(30,255,CV_THRESH_BINARY)
     # binarized_image.save_image("binarized_image.png")
-    enemy_pos = check_insect_info(binarized_image)
+    enemy_pos = search_insect(binarized_image)
 
     [head_pos, tail_pos, enemy_pos]
+  end
+
+  # 虫の位置を調べる
+  def search_insect(cvmat)
+    rows = []
+    cols = []
+    cvmat.rows.times { |i|
+      cvmat.cols.times { |j|
+        if (cvmat[i,j][0] == 0)
+          rows << i
+          cols << j
+        end
+      }
+    }
+    CvPoint.new((cols.max+cols.min)/2,(rows.max+rows.min)/2)
   end
 
   def rgb2hsv(red, green, blue)

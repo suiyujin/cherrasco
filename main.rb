@@ -56,7 +56,7 @@ class Main < Sinatra::Base
         previous_upload_time = redis.lindex("images", "1")
         image_analyzer = ImageAnalyzer.new(previous_upload_time, image.upload_time)
 
-        if image_analyzer.exist_insect?
+        if image_analyzer.exist_insect?(redis)
           ### 虫を発見した場合、捕獲行動を開始
           settings.in_process = true
 
