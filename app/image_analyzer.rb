@@ -15,25 +15,25 @@ class ImageAnalyzer
 
   # 虫が存在するか
   def exist_insect?
+    @head_pos, @tail_pos, @enemy_pos = search_chupachaps
+
+    puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}"
+    puts "tail_pos :  #{@tail_pos.x}  #{@tail_pos.y}"
+    puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}"
+
+    if @head_pos.nil? || @tail_pos.nil?
+      # TODO: 前回の座標を調べる
+    end
+
     # boolを返す
     true
   end
 
   # ロボットへの命令を作成
   def make_command
-    head_pos, tail_pos, enemy_pos = search_chupachaps
-
-    puts head_pos
-    puts tail_pos
-
-    if head_pos.nil? || tail_pos.nil?
-      # TODO: 前回の座標を調べる
-    end
-
     # ロボットが進むべき角度と距離を計算
-    puts "enemy_pos :" + enemy_pos.x.to_s + "  " + enemy_pos.y.to_s
-    bot = MulyuRobot.new(head_pos, tail_pos, KMarkerInterval)
-    direction, distance_m = bot.calculateForTurn(enemy_pos)
+    bot = MulyuRobot.new(@head_pos, @tail_pos, KMarkerInterval)
+    direction, distance_m = bot.calculateForTurn(@enemy_pos)
     degree = direction * 180 / Math::PI
     # ロボットへの命令
     {
