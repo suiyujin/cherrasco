@@ -1,4 +1,5 @@
 require 'opencv'
+require './app/mulyu_robot.rb'
 include OpenCV
 
 class ImageAnalyzer
@@ -9,6 +10,7 @@ class ImageAnalyzer
   def initialize(previous_upload_time, current_upload_time)
     @previous_upload_time = previous_upload_time
     @current_upload_time = current_upload_time
+    @input_image = CvMat.load("#{File.expand_path(File.dirname(__FILE__))}/opencv/cherrasco/case4.jpg")
   end
 
   # 虫が存在するか
@@ -21,29 +23,21 @@ class ImageAnalyzer
 
   # ロボットへの命令を作成
   def make_command
-    begin
-      background_image = CvMat.load(INIT_UPLOAD_TIME+".jpg")
-      input_img = CvMat.load()
-    rescue
-      puts "hirakemasen desita"
-    end
 
-    input_image =
+    head_pos, tail_pos, enemy_pos = search_chupachaps
 
-    head_pos, tail_pos = check_robot_info
-    p head_pos
-    p tail_pos
+    puts head_pos
+    puts tail_pos
 
     if head_pos.nil? || tail_pos.nil?
       # TODO: 前回の座標を調べる
     end
 
     # ロボットが進むべき角度と距離を計算
-    enemy_center = check_insect_info
+    puts "enemy_pos :" + enemy_pos.x.to_s + "  " + enemy_pos.y.to_s
     bot = MulyuRobot.new(head_pos, tail_pos, KMarkerInterval)
-    direction, distance_m = bot.calculateForTurn(enemy_center)
+    direction, distance_m = bot.calculateForTurn(enemy_pos)
     degree = direction * 180 / Math::PI
-
     # ロボットへの命令
     {
       degree: degree,
@@ -54,7 +48,7 @@ class ImageAnalyzer
   private
 
   # 虫の位置を検出
-  def check_insect_info
+  def check_insect_info(cvmat)
     rows = []
     cols = []
     cvmat.rows.times { |i|
@@ -65,25 +59,12 @@ class ImageAnalyzer
         end
       }
     }
-    CvPoint.new((cols.max-cols.min)/2,(rows.max-rows.min)/2)
+    CvPoint.new((cols.max+cols.min)/2,(rows.max+rows.min)/2)
   end
 
-  # ロボットの位置と向きを検出
-  def check_robot_info
-    image_file_path = "#{File.expand_path(File.dirname(__FILE__))}/opencv/cherrasco/case1.png"
-    search_chupachaps(image_file_path)
-  end
-
-  def search_chupachaps(input_img_url)
+  def search_chupachaps
     head_pos = nil
     tail_pos = nil
-
-    begin
-      input_img = CvMat.load(input_img_url)
-    rescue
-      puts '開けませんでした'
-      exit
-    end
 
     # 円の検出
     dp = 1                # 分解能の比率の逆数
@@ -92,7 +73,7 @@ class ImageAnalyzer
     vote_threshold = 30   # 小さいほど多くの検出する円の個数が増える
     #min_radius = 100      # 今は使ってないけどいずれ
     #max_radius = 100      # 今は使ってないけどいずれ
-    gray = input_img.BGR2GRAY
+    gray = @input_image.BGR2GRAY
     gray_smooth = gray.smooth(CV_GAUSSIAN)
     match = gray_smooth.hough_circles(
       CV_HOUGH_GRADIENT,
@@ -109,7 +90,7 @@ class ImageAnalyzer
       root2 = 2.0**(1.0/2.0)
       center_pos = CvPoint.new(circle[0], circle[1])
       crip_size = CvSize.new(circle[2]*2/root2, circle[2]*2/root2)
-      crip_img = input_img.rect_sub_pix(center_pos, crip_size)
+      crip_img = @input_image.rect_sub_pix(center_pos, crip_size)
 
       # 切り抜いた四角形を1pxのhsvに変換
       one_pix_img = crip_img.resize(CvSize.new(1, 1))
@@ -121,6 +102,11 @@ class ImageAnalyzer
           && (170 < hsv[1] && hsv[1] < 255) \
           && (80 < hsv[2] && hsv[2] < 200))
         head_pos = center_pos
+
+        from_head = CvPoint.new(circle[0]-circle[2]*2,circle[0]-circle[2]*2)
+        to_head = CvPoint.new(circle[0]+circle[2]*2,circle[0]+circle[2]*2)
+        gray_smooth.rectangle!(from_head,to_head, :color => CvColor::White, :thickness => -1)
+
       end
 
       # 青い丸があったら tail_pos に中心点を入れる
@@ -128,12 +114,20 @@ class ImageAnalyzer
           && (170 < hsv[1] && hsv[1] < 240) \
           && (80 < hsv[2] && hsv[2] < 200))
         tail_pos = center_pos
+
+        from_tail = CvPoint.new(circle[0]-circle[2]*2,circle[0]-circle[2]*2)
+        to_tail = CvPoint.new(circle[0]+circle[2]*2,circle[0]+circle[2]*2)
+        gray_smooth.rectangle!(from_tail,to_tail, :color => CvColor::White, :thickness => -1)
+
       end
 
       # todo: 色の閾値を調整する
     end
+    binarized_image = gray_smooth.threshold(30,255,CV_THRESH_BINARY)
+    # binarized_image.save_image("binarized_image.png")
+    enemy_pos = check_insect_info(binarized_image)
 
-    [head_pos, tail_pos]
+    [head_pos, tail_pos, enemy_pos]
   end
 
   def rgb2hsv(red, green, blue)
