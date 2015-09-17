@@ -6,7 +6,9 @@ require 'json'
 require './app/db_utils'
 require './app/image_file_utils'
 require './app/user'
+require './app/robot'
 require './app/image'
+require './app/image_analyzer'
 
 class Main < Sinatra::Base
   configure do
