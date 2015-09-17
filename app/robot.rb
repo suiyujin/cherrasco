@@ -1,5 +1,5 @@
 class Robot
-  attr_reader :exected_flag
+  attr_reader :executed_flag
 
   def initialize
     @executed_flag = false
