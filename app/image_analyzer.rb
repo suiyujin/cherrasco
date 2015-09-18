@@ -48,8 +48,6 @@ class ImageAnalyzer
     background_image = CvMat.load(PRIVATE_FILE_PATH + "background.jpg")
     diff_image = background_image.abs_diff(@input_image).not
 
-    diff_image.save_image(PRIVATE_FILE_PATH + "diff_image#{@current_upload_time}.png")
-
     # 円の検出
     dp = 1                # 分解能の比率の逆数
     min_dist = 50         # 円同士の距離
@@ -114,7 +112,7 @@ class ImageAnalyzer
     binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
     enemy_pos = search_insect(binarized_image)
 
-    diff_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'public/images/')}/diff_image_2_#{@current_upload_time}.png")
+    diff_image.save_image("#{PRIVATE_FILE_PATH}diff_image_#{@current_upload_time}.png")
 
     [head_pos, tail_pos, enemy_pos]
   end
