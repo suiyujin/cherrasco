@@ -42,7 +42,7 @@ class Main < Sinatra::Base
       # 捕獲モード中は、下記のプロセスを行わない
       unless settings.in_process
         image = Image.new(DateTime.now.strftime("%Y%m%d%H%M%S"), params[:image])
-        check_file_limit
+        check_file_limit("./public/images/", "2015*.jpg")
         image.save_jpg_from_binary
 
         redis = redis_connect
@@ -55,6 +55,10 @@ class Main < Sinatra::Base
 
         ### 画像を解析
         previous_upload_time = redis.lindex("images", "1")
+        # 古い画像ファイルを削除
+        check_file_limit("./tmp/images/", "binarized_image*.png")
+        check_file_limit("./public/images/", "diff_image*.png")
+
         image_analyzer = ImageAnalyzer.new(previous_upload_time, image.upload_time)
 
         if image_analyzer.exist_insect?
