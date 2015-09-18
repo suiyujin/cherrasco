@@ -24,7 +24,7 @@ class Main < Sinatra::Base
 
   post '/init' do
     begin
-      image = Image.new('00000000000000', params[:image])
+      image = Image.new('background', params[:image])
       image.save_jpg_from_binary
 
       status 200
