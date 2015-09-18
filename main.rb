@@ -67,8 +67,7 @@ class Main < Sinatra::Base
 
           # ロボットへ命令
           robot = settings.robot
-          robot.execute(image_analyzer.make_command) unless robot.executed_flag
-
+          robot.execute(image_analyzer.degree, image_analyzer.distance_m)
           # 捕獲するまで聞き続ける
           sleep 10 until robot.catch_insect?
           ### 虫を捕獲完了

@@ -3,6 +3,8 @@ require './app/mulyu_robot.rb'
 include OpenCV
 
 class ImageAnalyzer
+  attr_reader :degree, :distance_m
+
   INIT_UPLOAD_TIME = '00000000000000'
   #両マーカーの中心点間の距離(メートル)を設定
   KMarkerInterval = 0.10
@@ -48,13 +50,8 @@ class ImageAnalyzer
   def make_command
     # ロボットが進むべき角度と距離を計算
     bot = MulyuRobot.new(@head_pos, @tail_pos, KMarkerInterval)
-    direction, distance_m = bot.calculateForTurn(@enemy_pos)
-    degree = direction * 180 / Math::PI
-    # ロボットへの命令
-    {
-      degree: degree,
-      distance_m: distance_m
-    }
+    direction, @distance_m = bot.calculateForTurn(@enemy_pos)
+    @degree = direction * 180 / Math::PI
   end
 
   private
