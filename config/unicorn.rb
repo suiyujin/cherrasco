@@ -3,7 +3,7 @@
 worker_processes 1
 working_directory @dir
 
-timeout 300
+timeout 60
 listen "/var/www/cherrasco/tmp/unicorn.sock", backlog: 1024
 
 pid "#{@dir}tmp/pids/unicorn.pid" #pidを保存するファイル

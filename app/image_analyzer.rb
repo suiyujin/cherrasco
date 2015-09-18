@@ -6,6 +6,8 @@ class ImageAnalyzer
   attr_reader :degree, :distance_m
 
   INIT_UPLOAD_TIME = '00000000000000'
+  PRIVATE_FILE_PATH = "#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}"
+
   #両マーカーの中心点間の距離(メートル)を設定
   KMarkerInterval = 0.10
 
@@ -43,21 +45,28 @@ class ImageAnalyzer
     tail_pos = nil
     enemy_pos = nil
 
+    background_image = CvMat.load(PRIVATE_FILE_PATH + "background.jpg")
+    diff_image = background_image.abs_diff(@input_image).not
+
+    # diff_image.save_image(PRIVATE_FILE_PATH + "diff_image#{@current_upload_time}.png")
+
     # 円の検出
     dp = 1                # 分解能の比率の逆数
-    min_dist = 50        # 円同士の距離
+    min_dist = 50         # 円同士の距離
     edge_threshold = 20  # エッジの閾値
     vote_threshold = 50   # 小さいほど多くの検出する円の個数が増える
-    #min_radius = 100      # 今は使ってないけどいずれ
-    #max_radius = 100      # 今は使ってないけどいずれ
-    gray = @input_image.BGR2GRAY
+    min_radius = 50      # 今は使ってないけどいずれ
+    max_radius = 100      # 今は使ってないけどいずれ
+    gray = diff_image.BGR2GRAY
     gray_smooth = gray.smooth(CV_GAUSSIAN)
     match = gray_smooth.hough_circles(
       CV_HOUGH_GRADIENT,
       dp,
       min_dist,
       edge_threshold,
-      vote_threshold
+      vote_threshold,
+      min_radius,
+      max_radius
     )  # todo: dp以外は調整したほうがよさそう
 
 
@@ -99,8 +108,8 @@ class ImageAnalyzer
 
       # todo: 色の閾値を調整する
     end
-    binarized_image = gray_smooth.threshold(30,255,CV_THRESH_BINARY)
-    binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
+    binarized_image = gray_smooth.threshold(120,255,CV_THRESH_BINARY)
+    # binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
     enemy_pos = search_insect(binarized_image)
 
     [head_pos, tail_pos, enemy_pos]
