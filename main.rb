@@ -85,6 +85,8 @@ class Main < Sinatra::Base
       end
       status 200
     rescue => e
+      p e.message
+      p $@
       status 500
       message = "error : #{e.message}"
     end
