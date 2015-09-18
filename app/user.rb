@@ -17,25 +17,29 @@ class User
     @notified_flag = false
   end
 
-  def send_insect_notification
-    send_notification('虫を発見しました！')
+  def send_insect_notification(image_name)
+    send_notification('虫を発見しました！',1,"http://52.69.192.37/images/"+image_name+".jpg")
     @notified_flag = true
   end
 
   def send_insect_capture
-    send_notification('虫を捕獲しました！')
+    send_notification('虫を捕獲しました！',0,"")
     @notified_flag = false
   end
 
   private
 
-  def send_notification(alert)
+  def send_notification(alert,mode,image_url)
     APNS.send_notification(
       DEVICE_TOKEN,
       {
         alert: alert,
         badge: 1,
-        sound: 'default'
+        sound: 'default',
+        other: {
+          mode: mode,
+          image_url: image_url
+        }
       }
     )
     p "notified!!"

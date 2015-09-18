@@ -7,7 +7,7 @@ class Image
   end
 
   def save_jpg_from_binary
-    save_path = File.expand_path(File.dirname(__FILE__)).sub(/app/, "tmp/images/")
+    save_path = File.expand_path(File.dirname(__FILE__)).sub(/app/, "public/images/")
     file_name = "#{@upload_time}.jpg"
 
     File.open("#{save_path}#{file_name}", "wb") do |save_file|

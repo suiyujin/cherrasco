@@ -63,7 +63,7 @@ class Main < Sinatra::Base
 
           # ユーザーへ通知(発見から最初の一回のみ)
           user = settings.user
-          user.send_insect_notification unless user.notified_flag
+          user.send_insect_notification(image.upload_time) unless user.notified_flag
 
           # ロボットへ命令
           image_analyzer.make_command
