@@ -95,6 +95,7 @@ class ImageAnalyzer
         head_pos = center_pos
 
         gray_smooth.rectangle!(from, to, :color => CvColor::White, :thickness => -1)
+        diff_image.rectangle!(from, to, :color => CvColor::Black, :thickness => 3)
       end
 
       # 青い丸があったら tail_pos に中心点を入れる
@@ -104,6 +105,7 @@ class ImageAnalyzer
         tail_pos = center_pos
 
         gray_smooth.rectangle!(from, to, :color => CvColor::White, :thickness => -1)
+        diff_image.rectangle!(from, to, :color => CvColor::Black, :thickness => 3)
       end
 
       # todo: 色の閾値を調整する
@@ -111,6 +113,8 @@ class ImageAnalyzer
     binarized_image = gray_smooth.threshold(120,255,CV_THRESH_BINARY)
     binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
     enemy_pos = search_insect(binarized_image)
+
+    diff_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'public/images/')}/diff_image_2_#{@current_upload_time}.png")
 
     [head_pos, tail_pos, enemy_pos]
   end
