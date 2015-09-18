@@ -132,7 +132,11 @@ class ImageAnalyzer
         end
       }
     }
-    CvPoint.new((cols.max+cols.min)/2,(rows.max+rows.min)/2)
+    if rows.count > 0
+      CvPoint.new((cols.max+cols.min)/2,(rows.max+rows.min)/2)
+    else
+      nil
+    end
   end
 
   def rgb2hsv(red, green, blue)
