@@ -45,8 +45,8 @@ class ImageAnalyzer
 
     # 円の検出
     dp = 1                # 分解能の比率の逆数
-    min_dist = 100        # 円同士の距離
-    edge_threshold = 100  # エッジの閾値
+    min_dist = 50        # 円同士の距離
+    edge_threshold = 20  # エッジの閾値
     vote_threshold = 50   # 小さいほど多くの検出する円の個数が増える
     #min_radius = 100      # 今は使ってないけどいずれ
     #max_radius = 100      # 今は使ってないけどいずれ
@@ -90,8 +90,8 @@ class ImageAnalyzer
 
       # 青い丸があったら tail_pos に中心点を入れる
       if ((200 < hsv[0] && hsv[0] < 240) \
-          && (170 < hsv[1] && hsv[1] < 240) \
-          && (100 < hsv[2] && hsv[2] < 220))
+          && (50 < hsv[1] && hsv[1] < 240) \
+          && (50 < hsv[2]))
         tail_pos = center_pos
 
         gray_smooth.rectangle!(from, to, :color => CvColor::White, :thickness => -1)
