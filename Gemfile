@@ -14,5 +14,6 @@ group :development do
   gem "foreman"
   gem "sinatra-contrib"
   gem "pry"
+  gem "pry-byebug"
   gem "pry-doc"
 end
