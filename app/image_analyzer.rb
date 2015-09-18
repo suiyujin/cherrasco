@@ -18,32 +18,17 @@ class ImageAnalyzer
 
   # 虫が存在するか
   def exist_insect?(redis)
-    begin
-      @head_pos, @tail_pos, @enemy_pos = search_chupachaps
+    @head_pos, @tail_pos, @enemy_pos = search_chupachaps
 
-    if @head_pos.nil? || @tail_pos.nil?
-      # 前回の座標でCvPointを生成する
-      head_pos_x, head_pos_y = redis.hmget('head_pos', 'x', 'y')
-      tail_pos_x, tail_pos_y = redis.hmget('tail_pos', 'x', 'y')
-      @head_pos = CvPoint.new(head_pos_x, head_pos_y)
-      @tail_pos = CvPoint.new(tail_pos_x, tail_pos_y)
-      p "WARN : head_pos and tail_pos seted previous value!"
+    if @head_pos.nil? || @tail_pos.nil? || @enemy_pos.nil?
+      return false
+    else
+      puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}" unless @head_pos.nil?
+      puts "tail_pos :  #{@tail_pos.x}  #{@tail_pos.y}" unless @tail_pos.nil?
+      puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}" unless @enemy_pos.nil?
+
+      return true
     end
-
-    puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}"
-    puts "tail_pos :  #{@tail_pos.x}  #{@tail_pos.y}"
-    puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}"
-
-    rescue => e
-      puts e.message
-      puts $@
-    end
-
-    # Redis上に今回のhead_posとtail_posを保存しておく
-    redis.hmset('head_pos', 'x', @head_pos.x.to_s, 'y', @head_pos.y.to_s)
-    redis.hmset('tail_pos', 'x', @tail_pos.x.to_s, 'y', @tail_pos.y.to_s)
-
-    @enemy_pos.nil? ? false : true
   end
 
   # ロボットへの命令を作成
