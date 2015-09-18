@@ -10,16 +10,14 @@ class ImageAnalyzer
   def initialize(previous_upload_time, current_upload_time)
     @previous_upload_time = previous_upload_time
     @current_upload_time = current_upload_time
-    @input_image = CvMat.load("#{File.expand_path(File.dirname(__FILE__))}/opencv/cherrasco/case4.jpg")
+    #@input_image = CvMat.load("#{File.expand_path(File.dirname(__FILE__))}/opencv/cherrasco/case4.jpg")
+    @input_image = CvMat.load("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}#{current_upload_time}.jpg")
   end
 
   # 虫が存在するか
   def exist_insect?(redis)
-    @head_pos, @tail_pos, @enemy_pos = search_chupachaps
-
-    puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}"
-    puts "tail_pos :  #{@tail_pos.x}  #{@tail_pos.y}"
-    puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}"
+    begin
+      @head_pos, @tail_pos, @enemy_pos = search_chupachaps
 
     if @head_pos.nil? || @tail_pos.nil?
       # 前回の座標でCvPointを生成する
@@ -28,6 +26,15 @@ class ImageAnalyzer
       @head_pos = CvPoint.new(head_pos_x, head_pos_y)
       @tail_pos = CvPoint.new(tail_pos_x, tail_pos_y)
       p "WARN : head_pos and tail_pos seted previous value!"
+    end
+
+    puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}"
+    puts "tail_pos :  #{@tail_pos.x}  #{@tail_pos.y}"
+    puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}"
+
+    rescue => e
+      puts e.message
+      puts $@
     end
 
     # Redis上に今回のhead_posとtail_posを保存しておく
@@ -55,12 +62,13 @@ class ImageAnalyzer
   def search_chupachaps
     head_pos = nil
     tail_pos = nil
+    enemy_pos = nil
 
     # 円の検出
     dp = 1                # 分解能の比率の逆数
     min_dist = 100        # 円同士の距離
     edge_threshold = 100  # エッジの閾値
-    vote_threshold = 30   # 小さいほど多くの検出する円の個数が増える
+    vote_threshold = 50   # 小さいほど多くの検出する円の個数が増える
     #min_radius = 100      # 今は使ってないけどいずれ
     #max_radius = 100      # 今は使ってないけどいずれ
     gray = @input_image.BGR2GRAY
@@ -75,7 +83,7 @@ class ImageAnalyzer
 
 
     # 円毎にマーカーかチェック
-    match.each do |circle|
+    match.each_with_index do |circle, index|
       # 円に内接する四角形を切りぬき
       root2 = 2.0**(1.0/2.0)
       center_pos = CvPoint.new(circle[0], circle[1])
@@ -87,28 +95,27 @@ class ImageAnalyzer
       hsv = rgb2hsv(one_pix_img[0][2], one_pix_img[0][1], one_pix_img[0][0])
       # H:0-360, S:0-255, V:0-255
 
+      puts "circle_id : " + index.to_s
+      puts hsv
+      from = CvPoint.new(circle[0]-circle[2]*2, circle[1]-circle[2]*2)
+      to = CvPoint.new(circle[0]+circle[2]*2, circle[1]+circle[2]*2)
+
       # 赤い丸があったら head_pos に中心点を入れる
       if (((0 <= hsv[0] && hsv[0] < 20) || (340 < hsv[0] && hsv[0] <= 360)) \
-          && (170 < hsv[1] && hsv[1] < 255) \
-          && (80 < hsv[2] && hsv[2] < 200))
+          && (50 < hsv[1] && hsv[1] < 240) \
+          && (50 < hsv[2]))
         head_pos = center_pos
 
-        from_head = CvPoint.new(circle[0]-circle[2]*2,circle[0]-circle[2]*2)
-        to_head = CvPoint.new(circle[0]+circle[2]*2,circle[0]+circle[2]*2)
-        gray_smooth.rectangle!(from_head,to_head, :color => CvColor::White, :thickness => -1)
-
+        gray_smooth.rectangle!(from, to, :color => CvColor::White, :thickness => -1)
       end
 
       # 青い丸があったら tail_pos に中心点を入れる
       if ((200 < hsv[0] && hsv[0] < 240) \
           && (170 < hsv[1] && hsv[1] < 240) \
-          && (80 < hsv[2] && hsv[2] < 200))
+          && (100 < hsv[2] && hsv[2] < 220))
         tail_pos = center_pos
 
-        from_tail = CvPoint.new(circle[0]-circle[2]*2,circle[0]-circle[2]*2)
-        to_tail = CvPoint.new(circle[0]+circle[2]*2,circle[0]+circle[2]*2)
-        gray_smooth.rectangle!(from_tail,to_tail, :color => CvColor::White, :thickness => -1)
-
+        gray_smooth.rectangle!(from, to, :color => CvColor::White, :thickness => -1)
       end
 
       # todo: 色の閾値を調整する
