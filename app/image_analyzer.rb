@@ -15,7 +15,7 @@ class ImageAnalyzer
     @previous_upload_time = previous_upload_time
     @current_upload_time = current_upload_time
     #@input_image = CvMat.load("#{File.expand_path(File.dirname(__FILE__))}/opencv/cherrasco/case4.jpg")
-    @input_image = CvMat.load("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}#{current_upload_time}.jpg")
+    @input_image = CvMat.load("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'public/images/')}#{current_upload_time}.jpg")
   end
 
   # 虫が存在するか
