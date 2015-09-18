@@ -37,6 +37,7 @@ class Main < Sinatra::Base
   end
 
   post '/upload' do
+    p "----- post /upload(#{Time.now}) -----"
     begin
       # 捕獲モード中は、下記のプロセスを行わない
       unless settings.in_process

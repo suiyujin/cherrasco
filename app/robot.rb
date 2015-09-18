@@ -6,6 +6,7 @@ class Robot
   end
 
   def execute(command)
+    p "command : #{command}"
     # command通りにロボットを動かす
 
     @executed_flag = true
@@ -14,6 +15,7 @@ class Robot
   # 虫を捕まえたか
   def catch_insect?
     # boolを返す
+    @executed_flag = false
     true
   end
 end

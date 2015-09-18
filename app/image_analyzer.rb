@@ -114,7 +114,7 @@ class ImageAnalyzer
       # todo: 色の閾値を調整する
     end
     binarized_image = gray_smooth.threshold(30,255,CV_THRESH_BINARY)
-    # binarized_image.save_image("binarized_image.png")
+    binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
     enemy_pos = search_insect(binarized_image)
 
     [head_pos, tail_pos, enemy_pos]
