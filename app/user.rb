@@ -1,7 +1,10 @@
 require 'apns'
 
 class User
-  DEVICE_TOKEN = 'ba11ac578913bae7444415ba9f3111dd007372e41cbae8d6f8556c25de8fdf1b'
+  #mu
+  #DEVICE_TOKEN = 'ba11ac578913bae7444415ba9f3111dd007372e41cbae8d6f8556c25de8fdf1b'
+  DEVICE_TOKEN = 'ba11ac578913bae7444415ba9f3111dd007372e41cbae8d6f8556c25de8fdf1'
+  #pe
   #DEVICE_TOKEN = '8f1ca6e6ffdd3c754a0c455599de012288bbf8040c979ac6a875a7f7568fc962'
 
   attr_reader :notified_flag

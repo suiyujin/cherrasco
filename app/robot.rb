@@ -10,6 +10,7 @@ class Robot
 
   def execute(degree, distance_m)
     @command = "#{@command} #{degree} #{distance_m}"
+    puts @command
     system(@command)
   end
 

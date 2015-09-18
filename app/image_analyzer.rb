@@ -48,15 +48,15 @@ class ImageAnalyzer
     background_image = CvMat.load(PRIVATE_FILE_PATH + "background.jpg")
     diff_image = background_image.abs_diff(@input_image).not
 
-    # diff_image.save_image(PRIVATE_FILE_PATH + "diff_image#{@current_upload_time}.png")
+    diff_image.save_image(PRIVATE_FILE_PATH + "diff_image#{@current_upload_time}.png")
 
     # 円の検出
     dp = 1                # 分解能の比率の逆数
     min_dist = 50         # 円同士の距離
     edge_threshold = 20  # エッジの閾値
     vote_threshold = 50   # 小さいほど多くの検出する円の個数が増える
-    min_radius = 50      # 今は使ってないけどいずれ
-    max_radius = 100      # 今は使ってないけどいずれ
+    min_radius = 80      # 今は使ってないけどいずれ
+    max_radius = 120      # 今は使ってないけどいずれ
     gray = diff_image.BGR2GRAY
     gray_smooth = gray.smooth(CV_GAUSSIAN)
     match = gray_smooth.hough_circles(
@@ -109,7 +109,7 @@ class ImageAnalyzer
       # todo: 色の閾値を調整する
     end
     binarized_image = gray_smooth.threshold(120,255,CV_THRESH_BINARY)
-    # binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
+    binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
     enemy_pos = search_insect(binarized_image)
 
     [head_pos, tail_pos, enemy_pos]
