@@ -48,7 +48,7 @@ class ImageAnalyzer
     background_image = CvMat.load(PRIVATE_FILE_PATH + "background.jpg")
     diff_image = background_image.abs_diff(@input_image).not
 
-    # diff_image.save_image(PRIVATE_FILE_PATH + "diff_image#{@current_upload_time}.png")
+    diff_image.save_image(PRIVATE_FILE_PATH + "diff_image#{@current_upload_time}.png")
 
     # 円の検出
     dp = 1                # 分解能の比率の逆数
@@ -109,7 +109,7 @@ class ImageAnalyzer
       # todo: 色の閾値を調整する
     end
     binarized_image = gray_smooth.threshold(120,255,CV_THRESH_BINARY)
-    # binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
+    binarized_image.save_image("#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}/binarized_image#{@current_upload_time}.png")
     enemy_pos = search_insect(binarized_image)
 
     [head_pos, tail_pos, enemy_pos]
