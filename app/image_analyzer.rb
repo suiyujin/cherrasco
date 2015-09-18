@@ -6,7 +6,7 @@ class ImageAnalyzer
   attr_reader :degree, :distance_m
 
   INIT_UPLOAD_TIME = '00000000000000'
-  PRIVATE_FILE_PATH = "#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'tmp/images/')}"
+  PRIVATE_FILE_PATH = "#{File.expand_path(File.dirname(__FILE__)).sub(/app/, 'public/images/')}"
 
   #両マーカーの中心点間の距離(メートル)を設定
   KMarkerInterval = 0.10
