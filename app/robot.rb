@@ -15,6 +15,7 @@ class Robot
   # 虫を捕まえたか
   def catch_insect?
     # boolを返す
+    @executed_flag = false
     true
   end
 end
