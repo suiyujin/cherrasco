@@ -8,3 +8,5 @@
 
 db/config.yml
 config/server_certificates_development.pem
+
+/public/images/
