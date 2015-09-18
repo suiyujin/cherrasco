@@ -66,6 +66,7 @@ class Main < Sinatra::Base
           user.send_insect_notification unless user.notified_flag
 
           # ロボットへ命令
+          image_analyzer.make_command
           robot = settings.robot
           robot.execute(image_analyzer.degree, image_analyzer.distance_m)
           # 捕獲するまで聞き続ける
