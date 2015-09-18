@@ -55,8 +55,8 @@ class ImageAnalyzer
     min_dist = 50         # 円同士の距離
     edge_threshold = 20  # エッジの閾値
     vote_threshold = 50   # 小さいほど多くの検出する円の個数が増える
-    min_radius = 50      # 今は使ってないけどいずれ
-    max_radius = 100      # 今は使ってないけどいずれ
+    min_radius = 80      # 今は使ってないけどいずれ
+    max_radius = 120      # 今は使ってないけどいずれ
     gray = diff_image.BGR2GRAY
     gray_smooth = gray.smooth(CV_GAUSSIAN)
     match = gray_smooth.hough_circles(
