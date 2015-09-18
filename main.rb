@@ -57,7 +57,7 @@ class Main < Sinatra::Base
         previous_upload_time = redis.lindex("images", "1")
         image_analyzer = ImageAnalyzer.new(previous_upload_time, image.upload_time)
 
-        if image_analyzer.exist_insect?(redis)
+        if image_analyzer.exist_insect?
           ### 虫を発見した場合、捕獲行動を開始
           settings.in_process = true
 
@@ -66,6 +66,7 @@ class Main < Sinatra::Base
           user.send_insect_notification unless user.notified_flag
 
           # ロボットへ命令
+          image_analyzer.make_command
           robot = settings.robot
           robot.execute(image_analyzer.degree, image_analyzer.distance_m)
           # 捕獲するまで聞き続ける
