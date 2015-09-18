@@ -17,18 +17,14 @@ class ImageAnalyzer
   end
 
   # 虫が存在するか
-  def exist_insect?(redis)
+  def exist_insect?
     @head_pos, @tail_pos, @enemy_pos = search_chupachaps
 
-    if @head_pos.nil? || @tail_pos.nil? || @enemy_pos.nil?
-      return false
-    else
-      puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}" unless @head_pos.nil?
-      puts "tail_pos :  #{@tail_pos.x}  #{@tail_pos.y}" unless @tail_pos.nil?
-      puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}" unless @enemy_pos.nil?
+    puts "head_pos :  #{@head_pos.x}  #{@head_pos.y}" unless @head_pos.nil?
+    puts "tail_pos :  #{@tail_pos.x}  #{@tail_pos.y}" unless @tail_pos.nil?
+    puts "enemy_pos : #{@enemy_pos.x}  #{@enemy_pos.y}" unless @enemy_pos.nil?
 
-      return true
-    end
+    (@head_pos.nil? || @tail_pos.nil? || @enemy_pos.nil?) ? false : true
   end
 
   # ロボットへの命令を作成
@@ -37,6 +33,7 @@ class ImageAnalyzer
     bot = MulyuRobot.new(@head_pos, @tail_pos, KMarkerInterval)
     direction, @distance_m = bot.calculateForTurn(@enemy_pos)
     @degree = direction * 180 / Math::PI
+    puts @distance_m, @degree
   end
 
   private
