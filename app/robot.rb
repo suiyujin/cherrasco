@@ -9,9 +9,9 @@ class Robot
   end
 
   def execute(degree, distance_m)
-    @command = "#{@command} #{degree} #{distance_m}"
-    puts @command
-    system(@command)
+    command = "#{@command} #{degree} #{distance_m}"
+    puts command
+    system(command)
   end
 
   # 虫を捕まえたか
