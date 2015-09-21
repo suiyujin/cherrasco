@@ -3,3 +3,4 @@ port: 50022
 user: root
 identity_file: ~/.ssh/raspi-cherrasco.pem
 program: '/home/cherrasco/drive'
+infrared_program: '/home/cherrasco/infrared_sensor'

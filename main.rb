@@ -72,14 +72,16 @@ class Main < Sinatra::Base
           # ロボットへ命令
           image_analyzer.make_command
           robot = settings.robot
-          robot.execute(image_analyzer.degree, image_analyzer.distance_m)
-          # 捕獲するまで聞き続ける
-          sleep 10 until robot.catch_insect?
-          ### 虫を捕獲完了
-          settings.in_process = false
+          if robot.execute(image_analyzer.degree, image_analyzer.distance_m)
+            # ユーザーへ通知
+            user.send_insect_capture
+            ### 虫を捕獲完了
+            settings.in_process = false
+          else
+            ### 捕獲未完了
+            settings.in_process = true
+          end
 
-          # ユーザーへ通知
-          user.send_insect_capture
           message = "robot catched insect."
         else
           message = "not exist insect."
